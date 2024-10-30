@@ -85,7 +85,7 @@ public partial class DataContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("End_date");
-            entity.Property(e => e.Price1)
+            entity.Property(e => e.Price)
                 .HasColumnType("money")
                 .HasColumnName("Price");
             entity.Property(e => e.ProductId).HasColumnName("Product_id");
