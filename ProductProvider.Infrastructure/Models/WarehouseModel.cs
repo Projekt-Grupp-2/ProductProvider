@@ -1,6 +1,6 @@
-﻿using ProjectProvider.Infrastructure.Entities;
+﻿using ProductProvider.Infrastructure.Entities;
 
-namespace ProjectProvider.Infrastructure.Models;
+namespace ProductProvider.Infrastructure.Models;
 
 public class WarehouseModel
 {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using ProjectProvider.Infrastructure.Entities;
+using ProductProvider.Infrastructure.Entities;
 
-namespace ProjectProvider.Infrastructure.Contexts;
+namespace ProductProvider.Infrastructure.Contexts;
 
 public partial class DataContext : DbContext
 {

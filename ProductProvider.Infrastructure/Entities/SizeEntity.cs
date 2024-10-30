@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ProjectProvider.Infrastructure.Entities;
+namespace ProductProvider.Infrastructure.Entities;
 
 public partial class SizeEntity
 {

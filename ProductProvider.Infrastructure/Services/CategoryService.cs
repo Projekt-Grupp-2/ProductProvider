@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProjectProvider.Infrastructure.Contexts;
 
-namespace ProjectProvider.Infrastructure.Models;
+namespace ProductProvider.Infrastructure.Services;
 
 public class CategoryService(IDbContextFactory<DataContext> context)
 {
