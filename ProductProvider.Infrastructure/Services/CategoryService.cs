@@ -14,12 +14,13 @@ public class CategoryService(IDbContextFactory<DataContext> context)
         try
         {
             await using var context = _context.CreateDbContext();
-            var categoryEntities = await context.Categories.ToListAsync();
+            var categoryEntities = await context.Categories.Include(c => c.Products).ToListAsync();
 
             var categories = categoryEntities.Select(x => new CategoryModel
             {
                 Name = x.Name,
-                Icon = x.Icon
+                Icon = x.Icon,
+                Products = x.Products
             }).ToList();
 
             return categories;
@@ -44,8 +45,7 @@ public class CategoryService(IDbContextFactory<DataContext> context)
             return true;
         }
         catch (Exception ex)
-        {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+        {Console.WriteLine($"An error occurred: {ex.Message}");
             return false;
         }
     }
