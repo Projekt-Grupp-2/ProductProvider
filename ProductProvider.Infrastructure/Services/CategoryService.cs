@@ -24,31 +24,59 @@ public class CategoryService(IDbContextFactory<DataContext> context)
         return categories;
     }
 
-    public async Task<CategoryEntity> UpdateCategoryAsync(CategoryModel categoryModel)
-    {
-        try
-        {
-            await using var context = _context.CreateDbContext();
+  public async Task<CategoryEntity> CreateCategory(CategoryModel categoryModel)
+  {
+      try
+      {
+          await using var context = _context.CreateDbContext();
 
-            var categoryEntity = await context.Categories.FirstOrDefaultAsync(x => x.Name == categoryModel.Name);
-            if (categoryEntity == null)
-            {
-                return null!;
-            }
-            else
-            {
-                categoryEntity.Name = categoryModel.Name;
-                categoryEntity.Icon = categoryModel.Icon;
-                await context.SaveChangesAsync();
-                await context.DisposeAsync();
-                return categoryEntity;
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-            return null!;
-        }
+          var categoryEntity = await context.Categories.FirstOrDefaultAsync(x => x.Name == categoryModel.Name);
+          if (categoryEntity == null)
+          {
+              categoryEntity = new CategoryEntity
+              {
+                  Icon = categoryModel.Icon,
+                  Name = categoryModel.Name,
+              };
+              context.Categories.Add(categoryEntity);
+              await context.SaveChangesAsync();
+              await context.DisposeAsync();
+              return categoryEntity;
+          }
+          return categoryEntity;
+      }
+      catch (Exception ex)
+      {
+          Console.WriteLine(ex.ToString());
+          throw;
+      }
+  }
 
-    }
+  public async Task<CategoryEntity> UpdateCategoryAsync(CategoryModel categoryModel)
+  {
+      try
+      {
+          await using var context = _context.CreateDbContext();
+
+          var categoryEntity = await context.Categories.FirstOrDefaultAsync(x => x.Name == categoryModel.Name);
+          if (categoryEntity == null)
+          {
+              return null!;
+          }
+          else
+          {
+              categoryEntity.Name = categoryModel.Name;
+              categoryEntity.Icon = categoryModel.Icon;
+              await context.SaveChangesAsync();
+              await context.DisposeAsync();
+              return categoryEntity;
+          }
+      }
+      catch (Exception ex)
+      {
+          Console.WriteLine(ex.ToString());
+          return null!;
+      }
+
+  }
 }
