@@ -40,6 +40,7 @@ public class CategoryService(IDbContextFactory<DataContext> context)
                 };
                 context.Categories.Add(categoryEntity);
                 await context.SaveChangesAsync();
+                await context.DisposeAsync();
                 return categoryEntity;
             }
             return categoryEntity;
