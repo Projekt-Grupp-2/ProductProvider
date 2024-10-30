@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using ProjectProvider.Infrastructure.Contexts;
+using ProductProvider.Infrastructure.Contexts;
+using ProductProvider.Infrastructure.Models;
 
 namespace ProductProvider.Infrastructure.Services;
 
