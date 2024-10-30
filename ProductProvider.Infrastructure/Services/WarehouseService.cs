@@ -1,4 +1,4 @@
-﻿namespace ProjectProvider.Infrastructure.Models;
+﻿namespace ProductProvider.Infrastructure.Services;
 
 public class WarehouseService
 {
