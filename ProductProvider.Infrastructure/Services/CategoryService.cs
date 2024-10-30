@@ -45,6 +45,7 @@ public class CategoryService(IDbContextFactory<DataContext> context)
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"An error occurred: {ex.Message}");
             return false;
         }
     }
