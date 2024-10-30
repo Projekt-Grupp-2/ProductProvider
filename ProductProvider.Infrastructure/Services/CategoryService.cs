@@ -10,16 +10,41 @@ public class CategoryService(IDbContextFactory<DataContext> context)
 
     public async Task<IEnumerable<CategoryModel>> GetAllCategoriesAsync()
     {
-        await using var context = _context.CreateDbContext();
-        var categoryEntities = await context.Categories.Include(c => c.Products).ToListAsync();
-
-        var categories = categoryEntities.Select(x => new CategoryModel
+        try
         {
-            Name = x.Name,
-            Icon = x.Icon,
-            Products = x.Products
-        }).ToList();
+            await using var context = _context.CreateDbContext();
+            var categoryEntities = await context.Categories.ToListAsync();
 
-        return categories;
+            var categories = categoryEntities.Select(x => new CategoryModel
+            {
+                Name = x.Name,
+                Icon = x.Icon
+            }).ToList();
+
+            return categories;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null!;
+        } 
+    }
+
+    public async Task<bool> DeleteCategoryAsync(Guid id)
+    {
+        try
+        {
+            await using var context = _context.CreateDbContext();
+            var categoryEntity = await context.Categories.FirstOrDefaultAsync(i => i.Id == id);
+            if (categoryEntity == null) return false;
+
+            context.Categories.Remove(categoryEntity);
+            await context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 }
