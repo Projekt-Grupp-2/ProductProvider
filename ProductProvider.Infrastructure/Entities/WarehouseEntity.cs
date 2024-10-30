@@ -5,7 +5,7 @@ namespace ProductProvider.Infrastructure.Entities;
 
 public partial class WarehouseEntity
 {
-    public Guid UniqueProductId { get; set; }
+    public Guid UniqueProductId { get; set; } = Guid.NewGuid();
 
     public Guid? ProductId { get; set; }
 
