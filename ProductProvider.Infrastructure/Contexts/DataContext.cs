@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjectProvider.Infrastructure.Entities;
+using ProductProvider.Infrastructure.Entities;
 
 namespace ProductProvider.Infrastructure.Contexts;
 
