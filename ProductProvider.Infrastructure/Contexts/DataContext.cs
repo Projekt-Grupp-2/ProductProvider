@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using ProductProvider.Infrastructure.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectProvider.Infrastructure.Entities;
 
 namespace ProductProvider.Infrastructure.Contexts;
 
