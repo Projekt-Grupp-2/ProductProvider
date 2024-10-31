@@ -15,6 +15,7 @@ public class WarehouseService
         _contextFactory = contextFactory;
     }
 
+
     /// <summary>
     /// Creates a unique warehouse product entry in the database. 
     /// </summary>
@@ -84,6 +85,39 @@ public class WarehouseService
             }
         }
         catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+
+    /// <summary>
+    /// Retrieves a unique warehouse product entry from the database by its identifier.
+    /// </summary>
+    /// <param name="uniqueProductId">The unique identifier for the warehouse product to retrieve.</param>
+    /// <returns>A <see cref="WarehouseEntity"/> if found; otherwise, null.</returns>
+    public async Task<WarehouseEntity?> GetUniqueProduct(Guid uniqueProductId)
+    {
+        if (uniqueProductId == Guid.Empty)
+        {
+            Console.WriteLine("A valid product Id must be provided.");
+            return null;
+        }
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var warehouseEntity = await context.Warehouses.FirstOrDefaultAsync(w => w.UniqueProductId == uniqueProductId);
+
+            if (warehouseEntity == null) 
+            {
+                Console.WriteLine($"The product with the ID: {uniqueProductId} was not found.");
+                return null;
+            }
+
+            return warehouseEntity;
+        }
+        catch (Exception ex) 
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
             throw;
