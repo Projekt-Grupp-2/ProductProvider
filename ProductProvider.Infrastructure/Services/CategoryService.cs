@@ -74,8 +74,8 @@ public class CategoryService(IDbContextFactory<DataContext> context)
       }
       catch (Exception ex)
       {
-          Console.WriteLine(ex.ToString());
-          throw;
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null!;
       }
   }
 
@@ -101,8 +101,8 @@ public class CategoryService(IDbContextFactory<DataContext> context)
       }
       catch (Exception ex)
       {
-          Console.WriteLine(ex.ToString());
-          return null!;
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null!;
       }
 
   }
