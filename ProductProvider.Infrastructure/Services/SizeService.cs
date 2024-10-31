@@ -80,10 +80,11 @@ public class SizeService
 
 
     /// <summary>
-    /// Updates an existing size entity based on the provided <see cref="SizeModel"/>.
+    /// Updates an existing size entity in the database with the properties from the provided <see cref="SizeModel"/>.
     /// </summary>
-    /// <param name="sizeModel">The size model containing the updated information.</param>
-    /// <returns>A <see cref="SizeModel"/> representing the updated size if successful; otherwise, null. </returns>
+    /// <param name="newSizeModel">The new size model containing the updated information.</param>
+    /// <param name="oldSizeName">The name of the existing size to be updated.</param>
+    /// <returns> A <see cref="SizeModel"/> representing the updated size if successful; otherwise, null.</returns>
 
     public async Task<SizeModel?> UpdateSizeAsync(SizeModel newSizeModel, string oldSizeName)
     {
