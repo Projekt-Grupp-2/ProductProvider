@@ -4,6 +4,7 @@ namespace ProductProvider.Infrastructure.Models;
 
 public class ProductModel
 {
+    public Guid Id { get; set; }
     public string? Name { get; set; }
 
     public string? ShortDescription { get; set; }
@@ -18,11 +19,11 @@ public class ProductModel
 
     public virtual CategoryEntity? Category { get; set; }
 
-    public virtual List<ImageModel> Images { get; set; } = new List<ImageModel>();
+    public virtual ICollection<ImageModel> Images { get; set; } = new List<ImageModel>();
 
-    public virtual List<PriceModel> Prices { get; set; } = new List<PriceModel>();
+    public virtual ICollection<PriceModel> Prices { get; set; } = new List<PriceModel>();
 
     public virtual ICollection<ReviewEntity>? Reviews { get; set; } = new List<ReviewEntity>();
 
-    public virtual List<WarehouseModel> Warehouses { get; set; } = new List<WarehouseModel>();
+    public virtual ICollection<WarehouseModel> Warehouses { get; set; } = new List<WarehouseModel>();
 }

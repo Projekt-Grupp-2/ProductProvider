@@ -109,12 +109,14 @@ public class ProductService(IDbContextFactory<DataContext> context)
                 .Include(x => x.Prices)
                 .Include(x => x.Warehouses)
                 .Include(x => x.Reviews)
+                .Include(x => x.Category)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (productEntity != null )
             {
                 var productModel = new ProductModel
                 {
+                    Id = productEntity.Id,
                     Name = productEntity.Name,
                     ShortDescription = productEntity.ShortDescription,
                     LongDescription = productEntity.LongDescription,
@@ -139,6 +141,7 @@ public class ProductService(IDbContextFactory<DataContext> context)
                         SizeId = warehouse.SizeId,
                         CurrentStock = warehouse.CurrentStock,
                     }).ToList(),
+                    CategoryId = productEntity.Category?.Id ?? Guid.Empty
                 };
 
                 return productModel;
@@ -162,9 +165,9 @@ public class ProductService(IDbContextFactory<DataContext> context)
                 .Include(p => p.Images)
                 .Include(p => p.Prices)
                 .Include(p => p.Warehouses)
-                .FirstOrDefaultAsync(x => x.Name == productModel.Name);
+                .FirstOrDefaultAsync(x => x.Id == productModel.Id);
 
-            if (productEntity != null) 
+            if (productEntity != null)
             {
                 productEntity.Name = productModel.Name;
                 productEntity.ShortDescription = productModel.ShortDescription;
@@ -172,36 +175,56 @@ public class ProductService(IDbContextFactory<DataContext> context)
                 productEntity.CreatedAt = productModel.CreatedAt;
                 productEntity.IsTopseller = productModel.IsTopseller;
                 productEntity.CategoryId = productModel.CategoryId;
+
                 productEntity.Images.Clear();
-                productEntity.Images = productModel.Images.Select(image => new ImageEntity
-                {
-                    ImageUrl = image.ImageUrl,
-                }).ToList();
                 productEntity.Prices.Clear();
-                productEntity.Prices.Select(price => new PriceEntity
-                {
-                    Price = price.Price,
-                    Discount = price.Discount,
-                    DiscountPrice = price.DiscountPrice,
-                    StartDate = price.StartDate,
-                    EndDate = price.EndDate,
-                    IsActive = price.IsActive
-                }).ToList();
                 productEntity.Warehouses.Clear();
-                productEntity.Warehouses.Select(warehouse => new WarehouseEntity
+
+                foreach (var imageModel in productModel.Images)
                 {
-                    CurrentStock = warehouse.CurrentStock,
-                }).ToList();
+                    productEntity.Images.Add(new ImageEntity
+                    {
+                        ImageUrl = imageModel.ImageUrl
+                    });
+                }
+
+                foreach (var priceModel in productModel.Prices)
+                {
+                    productEntity.Prices.Add(new PriceEntity
+                    {
+                        Price = priceModel.Price1,
+                        Discount = priceModel.Discount,
+                        DiscountPrice = priceModel.DiscountPrice,
+                        StartDate = priceModel.StartDate,
+                        EndDate = priceModel.EndDate,
+                        IsActive = priceModel.IsActive
+                    });
+                }
+
+                foreach (var warehouseModel in productModel.Warehouses)
+                {
+                    productEntity.Warehouses.Add(new WarehouseEntity
+                    {
+                        CurrentStock = warehouseModel.CurrentStock,
+                        ColorId = warehouseModel.ColorId,
+                        SizeId = warehouseModel.SizeId,
+                    });
+                }
 
                 await context.SaveChangesAsync();
-               
                 return productEntity;
             }
+
+            Console.WriteLine("Product not found for the given ID.");
             return null!;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+            Console.WriteLine($"An error occurred while updating the product: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
             return null!;
         }
     }
