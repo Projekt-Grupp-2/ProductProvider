@@ -143,7 +143,7 @@ public class WarehouseService
         {
             await using var context = _contextFactory.CreateDbContext();
             var warehouseEntities = await context.Warehouses
-                .Where(w =>w.ProductId == productId)
+                .Where(w => w.ProductId == productId)
                 .ToListAsync();
 
             if (!warehouseEntities.Any())
@@ -154,7 +154,39 @@ public class WarehouseService
 
             return warehouseEntities;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Retrieves all unique warehouse products from the database.
+    /// <returns>An IEnumerable of WarehouseModel objects representing all 
+    /// unique products in the warehouse.</returns>
+    public async Task<IEnumerable<WarehouseModel>> GetAllUniqueProducts()
+    {
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var warehouseModels = await context.Warehouses
+                .Select(w => new WarehouseModel
+                {
+                    ProductId = w.ProductId,
+                    ColorId = w.ColorId,
+                    SizeId = w.SizeId,
+                    Product = w.Product,
+                    Color = w.Color,
+                    Size = w.Size,
+                    CurrentStock = w.CurrentStock,
+                }).ToListAsync();
+
+
+
+            return warehouseModels;
+        }
+        catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
             throw;
