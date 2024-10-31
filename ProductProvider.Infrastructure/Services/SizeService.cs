@@ -27,7 +27,7 @@ public class SizeService
             Console.WriteLine("A valid size name must be provided.");
             return null;
         }
-      try
+        try
         {
             await using var context = _contextFactory.CreateDbContext();
             var sizeEntity = await context.Sizes.FirstOrDefaultAsync(x => x.Name == sizeName);
@@ -65,7 +65,7 @@ public class SizeService
         try
         {
             await using var context = _contextFactory.CreateDbContext();
-            var sizeEntity = await context.Sizes.FirstOrDefaultAsync(x => x.Name == sizeName);
+            var sizeEntityToRemove = await context.Sizes.FirstOrDefaultAsync(s => s.Name == sizeName);
 
             if (sizeEntityToRemove == null)
             {
@@ -79,7 +79,12 @@ public class SizeService
               Console.WriteLine($"Size '{sizeName}' was successfully removed.");
               return true;
             }
-         }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Something went wrong:" + ex.Message);
+            throw;
+        }
     }
 
     /// <summary>
