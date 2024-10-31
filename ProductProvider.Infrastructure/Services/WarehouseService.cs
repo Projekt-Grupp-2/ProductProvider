@@ -109,13 +109,50 @@ public class WarehouseService
             await using var context = _contextFactory.CreateDbContext();
             var warehouseEntity = await context.Warehouses.FirstOrDefaultAsync(w => w.UniqueProductId == uniqueProductId);
 
-            if (warehouseEntity == null) 
+            if (warehouseEntity == null)
             {
                 Console.WriteLine($"The product with the ID: {uniqueProductId} was not found.");
                 return null;
             }
 
             return warehouseEntity;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+
+    /// <summary>
+    /// Retrieves all unique product variants associated with a specified product ID.
+    /// Unique product variants are determined by their associated sizes and colors.
+    /// <param name="productId">The identifier of the product for which to retrieve variants.</param>
+    /// <returns>Returns an enumerable list of <see cref="WarehouseEntity"/> objects representing the unique product variants. 
+    /// Returns an empty list if no variants are found or if an invalid product ID is provided.</returns>
+    public async Task<IEnumerable<WarehouseEntity>> GetUniqueProductVariantsByProductId(Guid productId)
+    {
+        if (productId == Guid.Empty)
+        {
+            Console.WriteLine("A valid product Id must be provided.");
+            return new List<WarehouseEntity>();
+        }
+
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var warehouseEntities = await context.Warehouses
+                .Where(w =>w.ProductId == productId)
+                .ToListAsync();
+
+            if (!warehouseEntities.Any())
+            {
+                Console.WriteLine($"No product with the Id: {productId} was found.");
+                return new List<WarehouseEntity>();
+            }
+
+            return warehouseEntities;
         }
         catch (Exception ex) 
         {
