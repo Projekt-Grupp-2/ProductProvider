@@ -32,6 +32,22 @@ public class CategoryService(IDbContextFactory<DataContext> context)
         } 
     }
 
+    public async Task<Guid?> GetCategoryIdByNameAsync(string categoryName)
+    {
+        try
+        {
+            await using var context = _context.CreateDbContext();
+            var categoryEntity = await context.Categories.FirstOrDefaultAsync(c => c.Name == categoryName);
+            return categoryEntity?.Id;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null;
+        }
+       
+    }
+
     public async Task<bool> DeleteCategoryAsync(Guid id)
     {
         try
