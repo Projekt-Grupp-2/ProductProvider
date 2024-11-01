@@ -9,7 +9,7 @@ public partial class WarehouseEntity
 
     public Guid? ProductId { get; set; }
 
-    public Guid? ColorId { get; set; }
+    public Guid ColorId { get; set; }
 
     public Guid? SizeId { get; set; }
 
