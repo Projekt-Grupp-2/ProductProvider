@@ -13,12 +13,10 @@ public class CategoryService_tests
     [Fact]
     public async Task GetAllCategoriesAsyncShould_GetAllCategories_ReturnCategories()
     {
-        // Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase") // Use InMemoryDatabase for testing
+            .UseInMemoryDatabase(databaseName: "GetAllCategoriesDatabase")
             .Options;
 
-        // Create a new context for the in-memory database
         await using (var context = new DataContext(options))
         {
             context.Categories.Add(new CategoryEntity { Name = "Category1", Icon = "Icon1", Products = new List<ProductEntity>() });
@@ -26,7 +24,6 @@ public class CategoryService_tests
             await context.SaveChangesAsync();
         }
 
-        // Create a mock of the IDbContextFactory
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
 
@@ -43,12 +40,64 @@ public class CategoryService_tests
     }
 
     [Fact]
-    public async Task DeleteCategoryAsyncShould_DeleteACategoryWithCorrectId_ReturnTrue()
+    public async Task DeleteCategoryAsyncShould_DeleteACategory_WhenCategoryExists()
     {
         // Arrange
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(databaseName: "DeleteCategoryDatabase")
+            .Options;
+
+        var categoryId = Guid.NewGuid();
+
+        await using (var context = new DataContext(options))
+        {
+            context.Categories.Add(new CategoryEntity { Id = categoryId, Name = "Category1", Icon = "Icon1" });
+            await context.SaveChangesAsync();
+        }
+
+        var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
+        dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
+
+        var categoryService = new CategoryService(dbContextFactoryMock.Object);
 
         // Act
+        var result = await categoryService.DeleteCategoryAsync(categoryId);
 
         // Assert
+        Assert.True(result);
+
+        await using (var context = new DataContext(options))
+        {
+            var deletedCategory = await context.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            Assert.Null(deletedCategory);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteCategoryAsyncShould_ReturnFalse_WhenCategoryDoesNotExist()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(databaseName: "DeleteCategoryDatabase")
+            .Options;
+
+        var nonExistentCategoryId = Guid.NewGuid();
+
+        await using (var context = new DataContext(options))
+        {
+            context.Categories.Add(new CategoryEntity { Id = Guid.NewGuid(), Name = "Category1", Icon = "Icon1" });
+            await context.SaveChangesAsync();
+        }
+
+        var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
+        dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
+
+        var categoryService = new CategoryService(dbContextFactoryMock.Object);
+
+        // Act
+        var result = await categoryService.DeleteCategoryAsync(nonExistentCategoryId);
+
+        // Assert
+        Assert.False(result);
     }
 }
