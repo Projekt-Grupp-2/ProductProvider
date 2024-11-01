@@ -20,7 +20,7 @@ public class CategoryService(IDbContextFactory<DataContext> context)
             {
                 Name = x.Name,
                 Icon = x.Icon,
-                Products = x.Products
+                Products = x.Products.ToList()
             }).ToList();
 
             return categories;
