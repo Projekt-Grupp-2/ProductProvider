@@ -3,7 +3,7 @@ using Moq;
 using ProductProvider.Infrastructure.Contexts;
 using ProductProvider.Infrastructure.Entities;
 using ProductProvider.Infrastructure.Services;
-using System.Linq.Expressions;
+
 
 namespace Infrastructure.Tests.Services;
 
@@ -15,14 +15,18 @@ public class CategoryService_tests
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .UseInMemoryDatabase(databaseName: "TestDatabase") // Use InMemoryDatabase for testing
             .Options;
 
-        await using var context = new DataContext(options);
-        context.Categories.Add(new CategoryEntity { Name = "Category1", Icon = "Icon1", Products = new List<ProductEntity>() });
-        context.Categories.Add(new CategoryEntity { Name = "Category2", Icon = "Icon2", Products = new List<ProductEntity>() });
-        await context.SaveChangesAsync();
+        // Create a new context for the in-memory database
+        await using (var context = new DataContext(options))
+        {
+            context.Categories.Add(new CategoryEntity { Name = "Category1", Icon = "Icon1", Products = new List<ProductEntity>() });
+            context.Categories.Add(new CategoryEntity { Name = "Category2", Icon = "Icon2", Products = new List<ProductEntity>() });
+            await context.SaveChangesAsync();
+        }
 
+        // Create a mock of the IDbContextFactory
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
 
