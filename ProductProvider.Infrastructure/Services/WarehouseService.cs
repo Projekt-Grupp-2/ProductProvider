@@ -193,6 +193,47 @@ public class WarehouseService
         }
     }
 
+
+    public async Task<WarehouseModel?> UpdateUniqueProductAsync(WarehouseModel newWarehouseModel, Guid warehouseId)
+    {
+        if (newWarehouseModel == null || warehouseId == Guid.Empty)
+        {
+            Console.WriteLine("A valid WarehouseModel and a valid warehouseId must be provided.");
+            return null;
+        }
+        try 
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var warehouseEntity = await context.Warehouses.FirstOrDefaultAsync(w => w.UniqueProductId == warehouseId);
+
+            if(warehouseEntity == null)
+            {
+                Console.WriteLine($"The product with the id: {warehouseId} was not found");
+                return null;
+            }
+
+            warehouseEntity.ColorId = newWarehouseModel.ColorId;
+            warehouseEntity.SizeId = newWarehouseModel.SizeId;
+            warehouseEntity.CurrentStock = newWarehouseModel.CurrentStock;
+
+            await context.SaveChangesAsync();
+
+            return new WarehouseModel
+            {
+                ProductId = warehouseEntity.ProductId,
+                ColorId = warehouseEntity.ColorId,
+                SizeId = warehouseEntity.SizeId
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+
+
     /// <summary>
     /// Deletes a unique product from the warehouse by its unique product ID.
     /// </summary>
