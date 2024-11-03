@@ -58,6 +58,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
                     Stars = r.Stars,
                     Text = r.Text,
                     ProductId = r.ProductId,
+                    Product = r.Product,
                 }).ToList();
 
                 return reviews;

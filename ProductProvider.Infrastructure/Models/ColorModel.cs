@@ -4,6 +4,7 @@ namespace ProductProvider.Infrastructure.Models;
 
 public class ColorModel
 {
+    public Guid Id { get; set; }
     public string? Name { get; set; }
 
     public string? HexadecimalColor { get; set; }
