@@ -126,7 +126,7 @@ public class WarehouseService
 
 
     /// <summary>
-    /// Retrieves all unique product variants associated with a specified product ID.
+    /// Retrieves all unique product variants associated of a product with a specified product ID.
     /// Unique product variants are determined by their associated sizes and colors.
     /// <param name="productId">The identifier of the product for which to retrieve variants.</param>
     /// <returns>Returns an enumerable list of <see cref="WarehouseEntity"/> objects representing the unique product variants. 
@@ -192,4 +192,41 @@ public class WarehouseService
             throw;
         }
     }
+
+    /// <summary>
+    /// Deletes a unique product from the warehouse by its unique product ID.
+    /// </summary>
+    /// <param name="uniqueProductId">The GUID of the product to be deleted.</param>
+    /// <returns> True if the product was successfully deleted; otherwise, false.</returns>
+    public async Task<bool> DeleteUniqueProductAsync(Guid uniqueProductId)
+    {
+        if (uniqueProductId == Guid.Empty)
+        {
+            Console.WriteLine("A valid product Id must be provided.");
+            return false;
+        }
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var warehouseEntity = await context.Warehouses.FirstOrDefaultAsync(w => w.UniqueProductId == uniqueProductId);
+            
+            if (warehouseEntity == null) 
+            {
+                Console.WriteLine($"The product with the ID: {uniqueProductId} was not found.");
+                return false;
+            }
+
+            context.Warehouses.Remove(warehouseEntity);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine($"The product was successfully deleted.");
+            return true;
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
 }
+
