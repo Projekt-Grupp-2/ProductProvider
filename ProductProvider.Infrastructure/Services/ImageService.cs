@@ -25,7 +25,7 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
     /// </summary>
     /// <param name="imageModel">The model containing the image data.</param>
     /// <returns> The created ImageEntity, or null if the image already exists or an error occurred.</returns>
-    public async Task<ImageEntity?> CreateImageAsync(ImageModel imageModel) 
+    public async Task<ImageEntity?> CreateImageAsync(ImageModel imageModel)
     {
         if (imageModel == null)
         {
@@ -35,8 +35,8 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
         try
         {
             await using var context = _contextFactory.CreateDbContext();
-            
-            if(!await context.Images.AnyAsync(i => i.ImageUrl == imageModel.ImageUrl))
+
+            if (!await context.Images.AnyAsync(i => i.ImageUrl == imageModel.ImageUrl))
             {
                 var imageEntity = new ImageEntity
                 {
@@ -57,4 +57,44 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
             throw;
         }
     }
+
+
+    /// <summary>
+    /// Retrieves an image by its ID.
+    /// </summary>
+    /// <param name="imageId">The unique identifier of the image to retrieve.</param>
+    /// <returns>An ImageModel if an ImageEntity with imageId is found; otherwise, null.</returns>
+    public async Task<ImageModel?> GetOneImageByIdAsync(Guid imageId)
+    {
+        if (imageId == Guid.Empty)
+        {
+            Console.WriteLine("You must provide a valid imageId");
+            return null;
+        }
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var imageEntity = await context.Images.FirstOrDefaultAsync(i => i.Id == imageId);
+
+            if (imageEntity == null)
+            {
+                Console.WriteLine($"The image with the id: {imageId} was not found.");
+                return null;
+            }
+            ImageModel imageModel = new ImageModel
+            {
+                ImageUrl = imageEntity.ImageUrl,
+                ProductId = imageEntity.ProductId
+            };
+
+            return imageModel;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
 }
