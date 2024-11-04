@@ -42,19 +42,19 @@ public class PriceService(IDbContextFactory<DataContext> context)
         {
             await using var context = _context.CreateDbContext();
 
-            var prices = await context.Prices
-                .Where(p => p.ProductId == productId)
-                .Select(price => new PriceModel
-                {
-                    ProductId = price.ProductId,
-                    Price1 = price.Price,
-                    Discount = price.Discount,
-                    DiscountPrice = price.DiscountPrice,
-                    StartDate = price.StartDate,
-                    EndDate = price.EndDate,
-                    IsActive = price.IsActive,
-                    Product = price.Product
-                }).ToListAsync();
+            var rawPrices = await context.Prices.Where(p => p.ProductId == productId).ToListAsync();
+
+            var prices = rawPrices.Select(price => new PriceModel
+            {
+                ProductId = price.ProductId,
+                Price1 = price.Price,
+                Discount = price.Discount,
+                DiscountPrice = price.DiscountPrice,
+                StartDate = price.StartDate,
+                EndDate = price.EndDate,
+                IsActive = price.IsActive,
+                Product = price.Product
+            }).ToList();
 
             return prices;
         }
@@ -167,6 +167,4 @@ public class PriceService(IDbContextFactory<DataContext> context)
             return null!;
         }
     }
-
-
 }
