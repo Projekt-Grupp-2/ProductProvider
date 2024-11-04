@@ -2,6 +2,7 @@
 using ProductProvider.Infrastructure.Contexts;
 using ProductProvider.Infrastructure.Entities;
 using ProductProvider.Infrastructure.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ProductProvider.Infrastructure.Services;
 
@@ -96,5 +97,47 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
             throw;
         }
     }
+
+
+    /// <summary>
+    /// Retrieves a list of images associated with a specific product ID.
+    /// </summary>
+    /// <param name="productId">The unique identifier of the product whose images are to be retrieved.</param>
+    /// <returns> A list of ImageModel corresponding to the images found; otherwise, null. </returns>
+    public async Task<List<ImageModel>?> GetImagesByProductIdAsync(Guid productId)
+    {
+        if (productId == Guid.Empty)
+        {
+            Console.WriteLine("You must provide a valid imageId");
+            return null;
+        }
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var imageEntities = await context.Images
+                .Where(i => i.ProductId == productId)
+                .ToListAsync();
+
+            if (!imageEntities.Any())
+            {
+                Console.WriteLine($"No images connected to the product id: {productId} were found.");
+                return null;
+            }
+
+            var imageModels = imageEntities.Select(imageEntity => new ImageModel
+            {
+                ImageUrl = imageEntity.ImageUrl,
+                ProductId = imageEntity.ProductId
+            }).ToList();
+
+            return imageModels;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
 
 }
