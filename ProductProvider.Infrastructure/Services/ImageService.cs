@@ -8,15 +8,6 @@ namespace ProductProvider.Infrastructure.Services;
 
 public class ImageService(IDbContextFactory<DataContext> contextFactory)
 {
-    /*public class ImageModel
-{
-    public Guid? ProductId { get; set; }
-
-    public string? ImageUrl { get; set; }
-
-    public virtual ProductEntity? Product { get; set; }
-}
-     */
 
     private readonly IDbContextFactory<DataContext> _contextFactory = contextFactory;
 
