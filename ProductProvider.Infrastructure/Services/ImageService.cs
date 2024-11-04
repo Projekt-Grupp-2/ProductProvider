@@ -55,7 +55,7 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
-            throw;
+            return null;
         }
     }
 
@@ -94,7 +94,7 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
-            throw;
+            return null;
         }
     }
 
@@ -135,9 +135,33 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
-            throw;
+            return null;
         }
     }
 
+    /// <summary>
+    /// Retrieves all images from the database.
+    /// </summary>
+    /// <returns>A list of ImageModel representing all images; otherwise, null.</returns>
 
+    public async Task<List<ImageModel>?> GetAllImagesAsync()
+    {
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var imageEntities = await context.Images.ToListAsync();
+            var imageModels = imageEntities.Select(imageEntity => new ImageModel
+            {
+                ImageUrl = imageEntity.ImageUrl,
+                ProductId = imageEntity.ProductId
+            }).ToList();
+
+            return imageModels;
+        }
+          catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null;
+        }
+    }
 }
