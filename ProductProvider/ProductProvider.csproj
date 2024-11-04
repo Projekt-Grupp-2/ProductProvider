@@ -38,4 +38,7 @@
   <ItemGroup>
     <Folder Include="Functions\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProductProvider.Infrastructure\ProductProvider.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

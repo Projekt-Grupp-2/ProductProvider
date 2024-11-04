@@ -30,9 +30,6 @@ public partial class DataContext : DbContext
 
     public virtual DbSet<WarehouseEntity> Warehouses { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Connectionstring");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CategoryEntity>(entity =>
