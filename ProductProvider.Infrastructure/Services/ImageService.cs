@@ -213,4 +213,40 @@ public class ImageService(IDbContextFactory<DataContext> contextFactory)
     }
 
 
+    /// <summary>
+    /// Deletes an image from the database by its ID.
+    /// </summary>
+    /// <param name="imageId">The unique identifier of the image to delete.</param>
+    /// <returns>True if the image was successfully deleted; otherwise, false.</returns>
+    public async Task<bool> DeleteImageAsync(Guid imageId)
+    {
+        if (imageId == Guid.Empty)
+        {
+            Console.WriteLine("You must provide a valid imageId");
+            return false;
+        }
+        try
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            var imageEntity = await context.Images.FirstOrDefaultAsync(i => i.Id == imageId);
+
+            if (imageEntity == null)
+            {
+                Console.WriteLine($"The image with the id: {imageId} was not found.");
+                return false;
+            }
+
+            context.Remove(imageEntity);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("The Image was successfully deleted.");
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return false;
+        }
+    }
 }
