@@ -253,7 +253,7 @@ public class WarehouseService
             {
                 if (newWarehouseModel.Size == null)
                 {
-                    warehouseEntity.SizeId = newWarehouseModel.ColorId;
+                    warehouseEntity.SizeId = newWarehouseModel.SizeId;
                 }
                 else if (newWarehouseModel.Size.Name != null)
                 {
