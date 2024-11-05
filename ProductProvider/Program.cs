@@ -1,26 +1,22 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProductProvider.Infrastructure.Contexts;
+using ProductProvider.Infrastructure.Services;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
-    .ConfigureAppConfiguration((context, config) =>
+    .ConfigureServices(services =>
     {
-        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true) 
-              .AddEnvironmentVariables();                                           
-    })
-    .ConfigureServices((context, services) =>
-    {
-        var configuration = context.Configuration;
-
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
 
-        services.AddDbContext<DataContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("SQLDatabase")));
+        services.AddPooledDbContextFactory<DataContext>(options =>
+            options.UseSqlServer(Environment.GetEnvironmentVariable("RikaProductProviderDB")));
+
+        services.AddSingleton<ProductService>();
+        services.AddSingleton<WarehouseService>();
     })
     .Build();
 

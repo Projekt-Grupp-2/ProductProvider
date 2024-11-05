@@ -1,42 +1,37 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ProductProvider.Infrastructure.Contexts;
+using ProductProvider.Infrastructure.Services;
 
-namespace ProductProvider.Functions
+namespace ProductProvider.Functions;
+
+public class GetProducts(ILogger<GetProducts> logger, ProductService productService)
 {
-    public class GetProducts(ILogger<GetProducts> logger, DataContext context)
+    private readonly ILogger<GetProducts> _logger = logger;
+    private readonly ProductService _productService = productService;
+
+    [Function("GetProducts")]
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
     {
-        private readonly ILogger<GetProducts> _logger = logger;
-        private readonly DataContext _context = context;
-
-        [Function("GetProducts")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        _logger.LogInformation("Processing request to get products.");
+        try
         {
-            _logger.LogInformation("Processing request to get products.");
-
-            var products = await _context.Products
-                .Select(p => new
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    ShortDescription = p.ShortDescription,
-                    LongDescription = p.LongDescription,
-                    Category = p.Category,
-                    CreatedAt = p.CreatedAt,
-                    IsTopseller = p.IsTopseller,
-                    Images = p.Images,
-                    Prices = p.Prices,
-                    Reviews = p.Reviews,
-                    Warehouses = p.Warehouses
-                }).ToListAsync();
+            var products = await _productService.GetAllProductsAsync();
 
             var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
             await response.WriteAsJsonAsync(products);
 
             return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred when getting products.");
+
+            var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
+            await errorResponse.WriteAsJsonAsync(errorResponse);
+
+            return errorResponse;
         }
     }
 }
