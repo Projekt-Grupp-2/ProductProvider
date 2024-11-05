@@ -193,7 +193,20 @@ public class WarehouseService
         }
     }
 
-
+    /// <summary>
+    /// Updates a unique warehouse product entry in the database.
+    /// This method modifies the properties of an existing warehouse product identified by the provided warehouseId.
+    /// 
+    /// It checks if the provided WarehouseModel contains new color and size information. If the color or size does not exist
+    /// in the database, it creates new entries for them. If they do exist, it updates the product with the corresponding
+    /// IDs. The method also updates the current stock of the product. 
+    /// 
+    /// Returns the updated WarehouseModel if successful, or null if the warehouse model is null, the warehouseId is empty, 
+    /// or the product was not found in the database.
+    /// 
+    /// <param name="newWarehouseModel">The new WarehouseModel containing the updated product details.</param>
+    /// <param name="warehouseId">The unique identifier for the warehouse product to be updated.</param>
+    /// <returns>The updated WarehouseModel or null.</returns>
     public async Task<WarehouseModel?> UpdateUniqueProductAsync(WarehouseModel newWarehouseModel, Guid warehouseId)
     {
         if (newWarehouseModel == null || warehouseId == Guid.Empty)
@@ -212,8 +225,53 @@ public class WarehouseService
                 return null;
             }
 
-            warehouseEntity.ColorId = newWarehouseModel.ColorId;
-            warehouseEntity.SizeId = newWarehouseModel.SizeId;
+            if (warehouseEntity.ColorId == Guid.Empty) 
+            {
+                if (newWarehouseModel.Color == null)
+                {
+                    warehouseEntity.ColorId = newWarehouseModel.ColorId;
+                }
+                else if (newWarehouseModel.Color.Name != null || newWarehouseModel.Color.HexadecimalColor != null)
+                {
+                    var newColor = new ColorEntity
+                    {
+                        Name = newWarehouseModel.Color.Name,
+                        HexadecimalColor = newWarehouseModel.Color.HexadecimalColor
+                    };
+
+                    await context.Colors.AddAsync(newColor).ConfigureAwait(false);
+
+                    warehouseEntity.ColorId = newColor.Id;
+                }
+            }
+            else
+            {
+                warehouseEntity.ColorId = newWarehouseModel.ColorId;
+            }
+
+            if (warehouseEntity.SizeId == Guid.Empty)
+            {
+                if (newWarehouseModel.Size == null)
+                {
+                    warehouseEntity.SizeId = newWarehouseModel.ColorId;
+                }
+                else if (newWarehouseModel.Size.Name != null)
+                {
+                    var newSize = new SizeEntity
+                    {
+                        Name = newWarehouseModel.Size.Name,
+                    };
+
+                    await context.Sizes.AddAsync(newSize).ConfigureAwait(false);
+
+                    warehouseEntity.SizeId = newSize.Id;
+                }
+            }
+            else
+            {
+                warehouseEntity.SizeId = newWarehouseModel.SizeId;
+            }
+
             warehouseEntity.CurrentStock = newWarehouseModel.CurrentStock;
 
             await context.SaveChangesAsync();
@@ -222,7 +280,8 @@ public class WarehouseService
             {
                 ProductId = warehouseEntity.ProductId,
                 ColorId = warehouseEntity.ColorId,
-                SizeId = warehouseEntity.SizeId
+                SizeId = warehouseEntity.SizeId,
+                CurrentStock = warehouseEntity.CurrentStock
             };
         }
         catch (Exception ex)
