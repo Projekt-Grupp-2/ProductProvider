@@ -19,5 +19,5 @@ public class PriceModel
 
     public bool IsActive { get; set; }
 
-    public virtual ProductEntity Product { get; set; } = new ProductEntity();
+    public virtual ProductEntity? Product { get; set; } 
 }

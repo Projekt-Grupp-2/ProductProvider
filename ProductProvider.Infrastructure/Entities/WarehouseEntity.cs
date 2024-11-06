@@ -14,7 +14,7 @@ public partial class WarehouseEntity
 
     public virtual ColorEntity? Color { get; set; }
 
-    public virtual ProductEntity Product { get; set; } = new ProductEntity();
+    public virtual ProductEntity? Product { get; set; } = new ProductEntity();
 
     public virtual SizeEntity? Size { get; set; }
 }

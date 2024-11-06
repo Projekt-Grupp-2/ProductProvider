@@ -16,22 +16,18 @@ public class ReviewService(IDbContextFactory<DataContext> context)
         {
             await using var context = _context.CreateDbContext();
 
-            if (reviewModel.Text != null && reviewModel.Stars != null && reviewModel.ProductId != Guid.Empty)
-            {
                 var reviewEntity = new ReviewEntity
                 {
                     Stars = reviewModel.Stars,
                     Text = reviewModel.Text,
                     ProductId = reviewModel.ProductId,
+                    Product = reviewModel.Product,
                 };
                 context.Reviews.Add(reviewEntity);
                 await context.SaveChangesAsync();
                 await context.DisposeAsync();
                 Console.WriteLine("Review successfully created");
                 return reviewEntity;
-            }
-            return null!;
-
         }
         catch (Exception ex)
         {
