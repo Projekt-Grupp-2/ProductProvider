@@ -322,7 +322,7 @@ public class ProductService_tests
     }
 
     [Fact]
-    public async Task RemoveProductAsyncShould_DeleteProductAndReturnTrue_WhenProductExists()
+    public async Task DeleteProductAsyncShould_DeleteProductAndReturnTrue_WhenProductExists()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
