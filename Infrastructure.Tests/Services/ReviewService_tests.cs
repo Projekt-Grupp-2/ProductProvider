@@ -59,36 +59,6 @@ public class ReviewServiceTests
 
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
 
-        //var categoryEntity = new CategoryEntity
-        //{
-        //    Name = "Test category",
-        //    Icon = ""
-        //};
-
-        //var productEntity = new ProductEntity
-        //{
-        //    Name = "Test Product",
-        //    ShortDescription = "Test Short Description",
-        //    LongDescription = "Test Long Description",
-        //    CategoryId = categoryEntity.Id,
-        //    CreatedAt = DateTime.UtcNow,
-        //    IsTopseller = true,
-        //    Category = categoryEntity,
-        //    Images = new List<ImageEntity>
-        //    {
-        //        new ImageEntity { ImageUrl = "http://image1.com" },
-        //        new ImageEntity { ImageUrl = "http://image2.com" }
-        //    },
-        //    Prices = new List<PriceEntity>
-        //    {
-        //        new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow, IsActive = true }
-        //    },
-        //    Warehouses = new List<WarehouseEntity>
-        //    {
-        //        new WarehouseEntity { CurrentStock = 50 }
-        //    }
-        //};
-
         var reviewModel = new ReviewModel
         {
             Text = "Great product!",
