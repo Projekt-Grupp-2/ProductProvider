@@ -5,19 +5,19 @@ namespace ProductProvider.Infrastructure.Models;
 public class ProductModel
 {
     public Guid Id { get; set; }
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string? ShortDescription { get; set; }
+    public string ShortDescription { get; set; } = null!;
 
     public string? LongDescription { get; set; }
 
-    public Guid? CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public bool? IsTopseller { get; set; }
+    public bool IsTopseller { get; set; }
 
-    public virtual CategoryEntity? Category { get; set; }
+    public virtual CategoryEntity Category { get; set; } = new CategoryEntity();
 
     public virtual ICollection<ImageModel> Images { get; set; } = new List<ImageModel>();
 

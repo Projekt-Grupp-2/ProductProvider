@@ -21,8 +21,8 @@ public class ProductService(IDbContextFactory<DataContext> context)
                 ShortDescription = productModel.ShortDescription,
                 LongDescription = productModel.LongDescription,
                 CategoryId = productModel.CategoryId,
-                CreatedAt = productModel.CreatedAt ?? DateTime.UtcNow,
-                IsTopseller = productModel.IsTopseller ?? false,
+                CreatedAt = productModel.CreatedAt,
+                IsTopseller = productModel.IsTopseller,
                 Images = productModel.Images!.Select(image => new ImageEntity
                 {
                     ImageUrl = image.ImageUrl,

@@ -75,11 +75,12 @@ public class ColorService(IDbContextFactory<DataContext> context)
             await using var context = _context.CreateDbContext();
 
             var productList = await context.Warehouses.Where(x => x.ProductId == ProductId).ToListAsync();
-            var colorIds = new List<Guid>();
+            var colorIds = new List<Guid?>();
 
             foreach (var entity in productList)
             {
-                colorIds.Add(entity.ColorId);
+                if (entity.ColorId != null)
+                    colorIds.Add(entity.ColorId);
             };
             if (colorIds.Count > 0)
             {

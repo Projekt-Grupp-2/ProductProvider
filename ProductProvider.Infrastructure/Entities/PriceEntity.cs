@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ProductProvider.Infrastructure.Entities;
+﻿namespace ProductProvider.Infrastructure.Entities;
 
 public partial class PriceEntity
 {
@@ -9,7 +6,7 @@ public partial class PriceEntity
 
     public Guid ProductId { get; set; }
 
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     public decimal? Discount { get; set; }
 
@@ -19,7 +16,7 @@ public partial class PriceEntity
 
     public DateTime? EndDate { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
-    public virtual ProductEntity? Product { get; set; }
+    public virtual ProductEntity Product { get; set; } = new ProductEntity();
 }
