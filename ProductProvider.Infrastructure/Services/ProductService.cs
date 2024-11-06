@@ -68,6 +68,7 @@ public class ProductService(IDbContextFactory<DataContext> context)
 
             var products = productEntities.Select(x => new ProductModel
             {
+                Id = x.Id,
                 Name = x.Name,
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
