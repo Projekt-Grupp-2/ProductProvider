@@ -2,6 +2,7 @@
 using ProductProvider.Infrastructure.Contexts;
 using ProductProvider.Infrastructure.Entities;
 using ProductProvider.Infrastructure.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ProductProvider.Infrastructure.Services;
 
@@ -68,6 +69,7 @@ public class ProductService(IDbContextFactory<DataContext> context)
 
             var products = productEntities.Select(x => new ProductModel
             {
+                Id = x.Id,
                 Name = x.Name,
                 ShortDescription = x.ShortDescription,
                 LongDescription = x.LongDescription,
@@ -76,10 +78,13 @@ public class ProductService(IDbContextFactory<DataContext> context)
                 IsTopseller = x.IsTopseller,
                 Images = x.Images.Select(image => new ImageModel
                 {
+                    ProductId = image.ProductId,
                     ImageUrl = image.ImageUrl
                 }).ToList(),
                 Prices = x.Prices.Select(price => new PriceModel
                 {
+                Id = price.Id,
+                ProductId = price.ProductId,
                 Price1 = price.Price,
                 Discount = price.Discount,
                 DiscountPrice = price.DiscountPrice,
@@ -124,10 +129,13 @@ public class ProductService(IDbContextFactory<DataContext> context)
                     CreatedAt = productEntity.CreatedAt,
                     Images = productEntity.Images.Select(image => new ImageModel
                     {
+                        ProductId = image.ProductId,
                         ImageUrl = image.ImageUrl
                     }).ToList(),
                     Prices = productEntity.Prices.Select(price => new PriceModel
                     {
+                        Id = price.Id,
+                        ProductId = price.ProductId,
                         Price1 = price.Price,
                         Discount = price.Discount,
                         DiscountPrice = price.DiscountPrice,
