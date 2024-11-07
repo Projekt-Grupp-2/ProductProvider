@@ -7,7 +7,7 @@ public class PriceModel
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }
 
-    public decimal? Price1 { get; set; }
+    public decimal Price1 { get; set; } 
 
     public decimal? Discount { get; set; }
 
@@ -17,7 +17,7 @@ public class PriceModel
 
     public DateTime? EndDate { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
-    public virtual ProductEntity? Product { get; set; }
+    public virtual ProductEntity? Product { get; set; } 
 }

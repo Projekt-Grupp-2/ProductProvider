@@ -4,7 +4,7 @@ namespace ProductProvider.Infrastructure.Models;
 
 public class CategoryModel
 {
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public string? Icon { get; set; }
 

@@ -4,9 +4,9 @@ namespace ProductProvider.Infrastructure.Models;
 
 public class ImageModel
 {
-    public Guid? ProductId { get; set; }
+    public Guid ProductId { get; set; }
 
-    public string? ImageUrl { get; set; }
+    public string ImageUrl { get; set; } = null!;
 
-    public virtual ProductEntity? Product { get; set; }
+    public virtual ProductEntity Product { get; set; } = new ProductEntity();
 }

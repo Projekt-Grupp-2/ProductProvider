@@ -1,11 +1,4 @@
-﻿using ProductProvider.Infrastructure.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProductProvider.Infrastructure.Models;
+﻿namespace ProductProvider.Infrastructure.Models;
 
 public  class ReviewUpdateRequest
 {
@@ -13,7 +6,7 @@ public  class ReviewUpdateRequest
 
     public Guid? ProductId { get; set; }
 
-    public int? Stars { get; set; }
+    public int Stars { get; set; }
 
-    public string? Text { get; set; }
+    public string Text { get; set; } = null!;
 }

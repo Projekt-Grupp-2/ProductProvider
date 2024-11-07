@@ -16,22 +16,18 @@ public class ReviewService(IDbContextFactory<DataContext> context)
         {
             await using var context = _context.CreateDbContext();
 
-            if (reviewModel.Text != null && reviewModel.Stars != null && reviewModel.ProductId != Guid.Empty)
-            {
                 var reviewEntity = new ReviewEntity
                 {
                     Stars = reviewModel.Stars,
                     Text = reviewModel.Text,
                     ProductId = reviewModel.ProductId,
+                    Product = reviewModel.Product,
                 };
                 context.Reviews.Add(reviewEntity);
                 await context.SaveChangesAsync();
                 await context.DisposeAsync();
                 Console.WriteLine("Review successfully created");
                 return reviewEntity;
-            }
-            return null!;
-
         }
         catch (Exception ex)
         {
@@ -40,7 +36,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
         }
     }
 
-    public async Task<IEnumerable<ReviewModel>> GetAllReviewsAsync()
+    public async Task<IEnumerable<ReviewEntity>> GetAllReviewsAsync()
     {
         try
         {
@@ -49,19 +45,12 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             var reviewEntities = await context.Reviews.Include(x => x.Product).ToListAsync();
             if (reviewEntities.Count == 0)
             {
-                return Enumerable.Empty<ReviewModel>();
+                return Enumerable.Empty<ReviewEntity>();
             }
             else
             {
-                var reviews = reviewEntities.Select(r => new ReviewModel
-                {
-                    Stars = r.Stars,
-                    Text = r.Text,
-                    ProductId = r.ProductId,
-                    Product = r.Product,
-                }).ToList();
-
-                return reviews;
+               
+                return reviewEntities;
             }
 
         }
@@ -88,6 +77,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             {
                 var reviews = reviewEntities.Select(r => new ReviewModel
                 {
+                    Id = r.Id,
                     Stars = r.Stars,
                     Text = r.Text,
                     ProductId = r.ProductId,
@@ -116,6 +106,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             {
                 var reviewModel = new ReviewModel
                 {
+                    Id = reviewEntity.Id,
                     Stars = reviewEntity.Stars,
                     Text = reviewEntity.Text,
                     ProductId = reviewEntity.ProductId,
