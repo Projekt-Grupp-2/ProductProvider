@@ -25,5 +25,5 @@ public class ProductModel
 
     public virtual ICollection<ReviewEntity>? Reviews { get; set; } = new List<ReviewEntity>();
 
-    public virtual ICollection<WarehouseModel> Warehouses { get; set; } = new List<WarehouseModel>();
+    public virtual ICollection<WarehouseModel>? Warehouses { get; set; } = new List<WarehouseModel>();
 }
