@@ -65,7 +65,7 @@ public class ProductService_tests
         var result = await productService.CreateProductAsync(productModel);
 
         // Assert
-        //Assert.NotNull(result);
+        Assert.NotNull(result);
         Assert.Equal(productModel.Name, result.Name);
         Assert.Equal(productModel.ShortDescription, result.ShortDescription);
         Assert.Equal(productModel.LongDescription, result.LongDescription);
