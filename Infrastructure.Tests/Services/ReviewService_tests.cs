@@ -9,6 +9,43 @@ using ProductProvider.Infrastructure.Entities;
 namespace Infrastructure.Tests.Services;
 public class ReviewServiceTests
 {
+
+    private readonly CategoryEntity _categoryEntity;
+    private readonly ProductEntity _productEntity;
+
+    public ReviewServiceTests()
+    {
+        _categoryEntity = new CategoryEntity
+        {
+            Name = "Test category",
+            Icon = ""
+        };
+
+        _productEntity = new ProductEntity
+        {
+            Name = "Test Product",
+            ShortDescription = "Test Short Description",
+            LongDescription = "Test Long Description",
+            CategoryId = _categoryEntity.Id,
+            CreatedAt = DateTime.UtcNow,
+            IsTopseller = true,
+            Category = _categoryEntity,
+            Images = new List<ImageEntity>
+            {
+                new ImageEntity { ImageUrl = "http://image1.com" },
+                new ImageEntity { ImageUrl = "http://image2.com" }
+            },
+            Prices = new List<PriceEntity>
+            {
+                new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow, IsActive = true }
+            },
+            Warehouses = new List<WarehouseEntity>
+            {
+                new WarehouseEntity { CurrentStock = 50 }
+            }
+        };
+    }
+
     [Fact]
     public async Task CreateReviewAsync_ValidReviewModel_ReturnsReviewEntity()
     {
@@ -26,9 +63,9 @@ public class ReviewServiceTests
         {
             Text = "Great product!",
             Stars = 5,
-            ProductId = Guid.NewGuid()
+            ProductId = _productEntity.Id,
+            Product = _productEntity,
         };
-
 
         // Act
         var result = await reviewService.CreateReviewAsync(reviewModel);
@@ -53,13 +90,12 @@ public class ReviewServiceTests
     [Fact]
     public async Task CreateReviewAsync_InvalidReviewModel_ReturnsNull()
     {
-        // Arrange
-        //var invalidReviewModel = new ReviewModel
-        //{
-          //  Text = null,
-            //Stars = null,
-            //ProductId = Guid.Empty
-        //};
+        //Arrange
+        var invalidReviewModel = new ReviewModel
+        {
+            Text = "Bad review",
+            Stars = 1,
+        };
 
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -70,15 +106,15 @@ public class ReviewServiceTests
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
 
-        // Act
-        //var result = await reviewService.CreateReviewAsync(invalidReviewModel);
+        //Act
+        var result = await reviewService.CreateReviewAsync(invalidReviewModel);
 
         // Assert
-        //Assert.Null(result);
+        Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetAllReviewsAsync_ShouldReturnAllReviews_AsReviewModels()
+    public async Task GetAllReviewsAsync_ShouldReturnAllReviews_AsReviewEntities()
     {
         //Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -88,16 +124,18 @@ public class ReviewServiceTests
 
         var review1 = context.Reviews.Add(new ReviewEntity
         {
-            ProductId = Guid.NewGuid(),
+            ProductId = _productEntity.Id,
             Stars = 5,
             Text = "Fantastic product!",
+            Product = _productEntity,
         });
 
         var review2 = context.Reviews.Add(new ReviewEntity
         {
-            ProductId = Guid.NewGuid(),
+            ProductId = _productEntity.Id,
             Stars = 1,
             Text = "Not my type!",
+            Product = _productEntity,
         });
 
         await context.SaveChangesAsync();
@@ -148,30 +186,19 @@ public class ReviewServiceTests
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        var context = new DataContext(options);
 
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(() => new DataContext(options));
 
 
-        using (var context = new DataContext(options))
-        {
-            context.Products.Add(new ProductEntity { Name = "ProductName1" });
-            await context.SaveChangesAsync();
+        context.Reviews.AddRange(
+            new ReviewEntity { ProductId = _productEntity.Id, Stars = 5, Text = "Fantastic product!", Product = _productEntity },
+            new ReviewEntity { ProductId = _productEntity.Id, Stars = 1, Text = "Not my type!", Product = _productEntity },
+            new ReviewEntity { ProductId = _productEntity.Id, Stars = 3, Text = "Pretty good!", Product = _productEntity }
+        );
 
-            var productService = new ProductService(dbContextFactoryMock.Object);
-            var productEntities = await productService.GetAllProductsAsync();
-
-            foreach (var product in productEntities)
-            {
-                context.Reviews.AddRange(
-                    new ReviewEntity { ProductId = product.Id, Stars = 5, Text = "Fantastic product!" },
-                    new ReviewEntity { ProductId = product.Id, Stars = 1, Text = "Not my type!" },
-                    new ReviewEntity { ProductId = product.Id, Stars = 3, Text = "Pretty good!" }
-                );
-            }
-            await context.SaveChangesAsync();
-        }
-
+        await context.SaveChangesAsync();
 
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
 
@@ -181,7 +208,6 @@ public class ReviewServiceTests
             var productEntities = verificationContext.Products.ToList();
             foreach (var product in productEntities)
             {
-
                 var result = await reviewService.GetReviewsByProductId(product.Id);
 
                 Assert.NotNull(result);
@@ -228,12 +254,11 @@ public class ReviewServiceTests
 
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(() => new DataContext(options));
-        var productId = Guid.NewGuid();
 
         context.Reviews.AddRange(
-                    new ReviewEntity { ProductId = productId, Stars = 5, Text = "Fantastic product!" },
-                    new ReviewEntity { ProductId = productId, Stars = 1, Text = "Not my type!" },
-                    new ReviewEntity { ProductId = productId, Stars = 3, Text = "Pretty good!" }
+                    new ReviewEntity { ProductId = _productEntity.Id, Stars = 5, Text = "Fantastic product!", Product = _productEntity },
+                    new ReviewEntity { ProductId = _productEntity.Id, Stars = 1, Text = "Not my type!", Product = _productEntity },
+                    new ReviewEntity { ProductId = _productEntity.Id, Stars = 3, Text = "Pretty good!" , Product = _productEntity }
                 );
 
         await context.SaveChangesAsync();
@@ -270,13 +295,13 @@ public class ReviewServiceTests
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(() => new DataContext(options));
 
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
-        
+
         //Act
         var result = await reviewService.GetReviewById(Guid.NewGuid());
 
         //Assert
         Assert.Null(result);
-       
+
     }
 
     [Fact]
@@ -286,7 +311,7 @@ public class ReviewServiceTests
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-       
+
 
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(() => new DataContext(options));
@@ -294,14 +319,15 @@ public class ReviewServiceTests
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
 
         ReviewEntity reviewEntity;
-        
+
         await using (var context = new DataContext(options))
         {
-           reviewEntity = new ReviewEntity {
-
-               ProductId = Guid.NewGuid(),
-               Text = "Old text",
-               Stars = 2,
+            reviewEntity = new ReviewEntity
+            {
+                ProductId = _productEntity.Id,
+                Text = "Old text",
+                Stars = 2,
+                Product = _productEntity,  
             };
             context.Reviews.Add(reviewEntity);
             await context.SaveChangesAsync();
@@ -312,8 +338,6 @@ public class ReviewServiceTests
             Stars = 5,
             Text = "Changed",
         };
-
-
 
         //Act
         var result = await reviewService.UpdateReviewAsync(reviewUpdateRequest);
@@ -340,17 +364,17 @@ public class ReviewServiceTests
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(() => new DataContext(options));
 
         var reviewService = new ReviewService(dbContextFactoryMock.Object);
-
+       
         ReviewEntity reviewEntity;
 
         await using (var context = new DataContext(options))
         {
             reviewEntity = new ReviewEntity
             {
-
-                ProductId = Guid.NewGuid(),
+                ProductId = _productEntity.Id,
                 Text = "Old text",
                 Stars = 2,
+                Product = _productEntity
             };
             context.Reviews.Add(reviewEntity);
             await context.SaveChangesAsync();
@@ -361,14 +385,12 @@ public class ReviewServiceTests
             Text = "Changed",
         };
 
-
-
         //Act
         var result = await reviewService.UpdateReviewAsync(reviewUpdateRequest);
 
         //Assert
         Assert.Null(result);
-        
+
 
     }
 

@@ -18,11 +18,11 @@ public partial class ProductEntity
 
     public virtual CategoryEntity Category { get; set; } = new CategoryEntity();
 
-    public virtual ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
+    public virtual ICollection<ImageEntity>? Images { get; set; } = new List<ImageEntity>();
 
-    public virtual ICollection<PriceEntity> Prices { get; set; } = new List<PriceEntity>();
+    public virtual ICollection<PriceEntity>? Prices { get; set; } = new List<PriceEntity>();
 
-    public virtual ICollection<ReviewEntity> Reviews { get; set; } = new List<ReviewEntity>();
+    public virtual ICollection<ReviewEntity>? Reviews { get; set; } = new List<ReviewEntity>();
 
-    public virtual ICollection<WarehouseEntity> Warehouses { get; set; } = new List<WarehouseEntity>();
+    public virtual ICollection<WarehouseEntity>? Warehouses { get; set; } = new List<WarehouseEntity>();
 }
