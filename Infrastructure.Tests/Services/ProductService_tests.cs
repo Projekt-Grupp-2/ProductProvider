@@ -280,17 +280,17 @@ public class ProductService_tests
                 CreatedAt = DateTime.UtcNow.AddDays(-10),
                 IsTopseller = false,
                 Images = new List<ImageEntity>
-            {
+                {
                 new ImageEntity { ImageUrl = "http://oldimage.com" }
-            },
+                },
                 Prices = new List<PriceEntity>
-            {
+                {
                 new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow.AddDays(-5), IsActive = true }
-            },
+                },
                 Warehouses = new List<WarehouseEntity>
-            {
+                {
                 new WarehouseEntity { CurrentStock = 50, ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid() }
-            }
+                }
             });
 
             await context.SaveChangesAsync();
