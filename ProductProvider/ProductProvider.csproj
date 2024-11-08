@@ -40,7 +40,7 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Functions\" />
+    <None Include="local.settings.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProductProvider.Infrastructure\ProductProvider.Infrastructure.csproj" />
