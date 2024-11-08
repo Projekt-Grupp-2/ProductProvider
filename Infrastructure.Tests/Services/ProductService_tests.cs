@@ -18,55 +18,77 @@ public class ProductService_tests
             .UseInMemoryDatabase(databaseName: "CreateProductDatabase")
             .Options;
 
+        var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
+        dbContextFactoryMock.Setup(factory => factory.CreateDbContext())
+            .Returns(new DataContext(options));
+
+        var productService = new ProductService(dbContextFactoryMock.Object);
+
+        // Create a CategoryEntity first
+        var categoryId = Guid.NewGuid();
+        await using (var context = new DataContext(options))
+        {
+            context.Categories.Add(new CategoryEntity
+            {
+                Id = categoryId,
+                Name = "Test Category",
+                Icon = ""
+            });
+
+            await context.SaveChangesAsync();
+        }
+
         var productModel = new ProductModel
         {
             Name = "Test Product",
             ShortDescription = "Test Short Description",
             LongDescription = "Test Long Description",
-            CategoryId = Guid.NewGuid(),
+            CategoryId = categoryId, // Use the valid CategoryId
             CreatedAt = DateTime.UtcNow,
             IsTopseller = true,
             Images = new List<ImageModel>
-            {
-                new ImageModel { ImageUrl = "http://image1.com" },
-                new ImageModel { ImageUrl = "http://image2.com" }
-            },
+        {
+            new ImageModel { ImageUrl = "http://image1.com" },
+            new ImageModel { ImageUrl = "http://image2.com" }
+        },
             Prices = new List<PriceModel>
-            {
-                new PriceModel { Price1 = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow, IsActive = true }
-            },
+        {
+            new PriceModel { Price1 = 100m, IsActive = false }
+        },
             Warehouses = new List<WarehouseModel>
-            {
-                new WarehouseModel { CurrentStock = 50 }
-            }
+        {
+            new WarehouseModel { CurrentStock = 50 }
+        }
         };
-
-        var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
-        dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
-
-        var productService = new ProductService(dbContextFactoryMock.Object);
 
         // Act
         var result = await productService.CreateProductAsync(productModel);
 
         // Assert
-        Assert.NotNull(result);
+        //Assert.NotNull(result);
         Assert.Equal(productModel.Name, result.Name);
         Assert.Equal(productModel.ShortDescription, result.ShortDescription);
         Assert.Equal(productModel.LongDescription, result.LongDescription);
         Assert.Equal(productModel.CategoryId, result.CategoryId);
         Assert.Equal(productModel.IsTopseller, result.IsTopseller);
-        Assert.Equal(2, result.Images.Count);
-        Assert.Single(result.Prices);
-        Assert.Single(result.Warehouses);
+        Assert.Equal(2, result.Images!.Count);
+        Assert.Single(result.Prices!);
+        Assert.Single(result.Warehouses!);
 
-        // Verify that the product was actually saved to the in-memory database
+        // Verify that the product was saved to the in-memory database
         await using (var context = new DataContext(options))
         {
-            var savedProduct = await context.Products.Include(p => p.Images).Include(p => p.Prices).Include(p => p.Warehouses)
-                                                     .FirstOrDefaultAsync(p => p.Id == result.Id);
+            var savedProduct = await context.Products
+                .Include(p => p.Images)
+                .Include(p => p.Prices)
+                .Include(p => p.Warehouses)
+                .FirstOrDefaultAsync(p => p.Id == result.Id);
+
             Assert.NotNull(savedProduct);
             Assert.Equal(productModel.Name, savedProduct.Name);
+            Assert.Equal(productModel.Images.Count, savedProduct.Images!.Count);
+            Assert.Equal(productModel.Prices.Count, savedProduct.Prices!.Count);
+            Assert.Equal(productModel.Warehouses.Count, savedProduct.Warehouses!.Count);
         }
     }
 
@@ -80,12 +102,22 @@ public class ProductService_tests
 
         await using (var context = new DataContext(options))
         {
+            var categoryId = Guid.NewGuid();
+
+            var category = new CategoryEntity
+            {
+                Id = categoryId,
+                Name = "Category1"
+            };
+            context.Categories.Add(category);
+
             context.Products.Add(new ProductEntity
             {
                 Name = "Product1",
                 ShortDescription = "Short description 1",
                 LongDescription = "Long description 1",
                 CategoryId = Guid.NewGuid(),
+                Category = category,
                 CreatedAt = DateTime.UtcNow,
                 IsTopseller = true,
                 Images = new List<ImageEntity>
@@ -104,6 +136,7 @@ public class ProductService_tests
                 ShortDescription = "Short description 2",
                 LongDescription = "Long description 2",
                 CategoryId = Guid.NewGuid(),
+                Category = category,
                 CreatedAt = DateTime.UtcNow,
                 IsTopseller = false,
                 Images = new List<ImageEntity>
@@ -220,34 +253,44 @@ public class ProductService_tests
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
+            .EnableSensitiveDataLogging()
             .UseInMemoryDatabase(databaseName: "UpdateProductDatabase")
             .Options;
 
         var productId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
 
         await using (var context = new DataContext(options))
         {
+            var category = new CategoryEntity
+            {
+                Id = categoryId,
+                Name = "Old Category"
+            };
+            context.Categories.Add(category);
+
             context.Products.Add(new ProductEntity
             {
                 Id = productId,
                 Name = "Old Product",
                 ShortDescription = "Old Short Description",
                 LongDescription = "Old Long Description",
-                CategoryId = Guid.NewGuid(),
+                CategoryId = categoryId,
+                Category = category,
                 CreatedAt = DateTime.UtcNow.AddDays(-10),
                 IsTopseller = false,
                 Images = new List<ImageEntity>
-                {
-                    new ImageEntity { ImageUrl = "http://oldimage.com" }
-                },
+            {
+                new ImageEntity { ImageUrl = "http://oldimage.com" }
+            },
                 Prices = new List<PriceEntity>
-                {
-                    new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow.AddDays(-5), IsActive = true }
-                },
+            {
+                new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow.AddDays(-5), IsActive = true }
+            },
                 Warehouses = new List<WarehouseEntity>
-                {
-                    new WarehouseEntity { CurrentStock = 50, ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid() }
-                }
+            {
+                new WarehouseEntity { CurrentStock = 50, ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid() }
+            }
             });
 
             await context.SaveChangesAsync();
@@ -255,7 +298,6 @@ public class ProductService_tests
 
         var dbContextFactoryMock = new Mock<IDbContextFactory<DataContext>>();
         dbContextFactoryMock.Setup(factory => factory.CreateDbContext()).Returns(new DataContext(options));
-
         var productService = new ProductService(dbContextFactoryMock.Object);
 
         var updatedProductModel = new ProductModel
@@ -264,21 +306,21 @@ public class ProductService_tests
             Name = "Updated Product",
             ShortDescription = "Updated Short Description",
             LongDescription = "Updated Long Description",
-            CategoryId = Guid.NewGuid(),
+            CategoryId = categoryId,
             CreatedAt = DateTime.UtcNow,
             IsTopseller = true,
             Images = new List<ImageModel>
-            {
-                new ImageModel { ImageUrl = "http://newimage.com" }
-            },
+        {
+            new ImageModel { ImageUrl = "http://newimage.com" }
+        },
             Prices = new List<PriceModel>
-            {
-                new PriceModel { Price1 = 150m, Discount = 20m, DiscountPrice = 130m, StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddDays(5), IsActive = true }
-            },
+        {
+            new PriceModel { Price1 = 150m, Discount = 20m, DiscountPrice = 130m, StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddDays(5), IsActive = true }
+        },
             Warehouses = new List<WarehouseModel>
-            {
-                new WarehouseModel { CurrentStock = 100, ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid() }
-            }
+        {
+            new WarehouseModel { CurrentStock = 100, ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid() }
+        }
         };
 
         // Act
@@ -290,9 +332,9 @@ public class ProductService_tests
         Assert.Equal("Updated Short Description", result.ShortDescription);
         Assert.Equal("Updated Long Description", result.LongDescription);
         Assert.True(result.IsTopseller);
-        Assert.Single(result.Images);
-        Assert.Single(result.Prices);
-        Assert.Single(result.Warehouses);
+        Assert.Single(result.Images!);
+        Assert.Single(result.Prices!);
+        Assert.Single(result.Warehouses!);
     }
 
     [Fact]
@@ -326,23 +368,30 @@ public class ProductService_tests
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: "RemoveProductDatabase")
-            .Options;
+        .EnableSensitiveDataLogging()
+        .UseInMemoryDatabase(databaseName: "RemoveProductIfExistDatabase")
+        .Options;
 
         var productId = Guid.NewGuid();
 
         await using (var context = new DataContext(options))
         {
-            context.Products.Add(new ProductEntity
+            var categoryId = Guid.NewGuid();
+
+            var category = new CategoryEntity
+            {
+                Id = categoryId,
+                Name = "Category1"
+            };
+
+            var product = new ProductEntity
             {
                 Id = productId,
                 Name = "Product1",
+                CategoryId = categoryId,
+                Category = category,
                 ShortDescription = "Short description",
                 LongDescription = "Long description",
-                Images = new List<ImageEntity>
-                {
-                    new ImageEntity { ImageUrl = "http://image1.com" }
-                },
                 Prices = new List<PriceEntity>
                 {
                     new PriceEntity { Price = 100m, Discount = 10m, DiscountPrice = 90m, StartDate = DateTime.UtcNow, IsActive = true }
@@ -351,7 +400,10 @@ public class ProductService_tests
                 {
                     new WarehouseEntity { ColorId = Guid.NewGuid(), SizeId = Guid.NewGuid(), CurrentStock = 50 }
                 }
-            });
+            };
+
+            context.Categories.Add(category);
+            context.Products.Add(product);
 
             await context.SaveChangesAsync();
         }

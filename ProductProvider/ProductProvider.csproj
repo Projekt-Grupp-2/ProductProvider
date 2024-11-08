@@ -43,9 +43,6 @@
     <Folder Include="Functions\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="local.settings.json" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ProductProvider.Infrastructure\ProductProvider.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
