@@ -17,6 +17,7 @@ var host = new HostBuilder()
 
         services.AddSingleton<ProductService>();
         services.AddSingleton<WarehouseService>();
+        services.AddSingleton<CategoryService>();
     })
     .Build();
 
