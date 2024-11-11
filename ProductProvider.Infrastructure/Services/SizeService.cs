@@ -15,14 +15,14 @@ public class SizeService
     }
 
     /// <summary>
-    /// Retrieves a size entity by its name.
+    /// Retrieves a size entity by its Id.
     /// </summary>
-    /// <param name="sizeName">The name of the size to retrieve.</param>
+    /// <param name="sizeId">The Id of the size to retrieve.</param>
     /// <returns>
     /// A <see cref="SizeEntity"/> if found; otherwise, null.</returns>
-    public async Task<SizeEntity?> GetOneSizeAsync(string sizeName)
+    public async Task<SizeEntity?> GetOneSizeAsync(Guid sizeId)
     {
-        if (string.IsNullOrWhiteSpace(sizeName))
+        if (sizeId == Guid.Empty)
         {
             Console.WriteLine("A valid size name must be provided.");
             return null;
@@ -30,11 +30,11 @@ public class SizeService
         try
         {
             await using var context = _contextFactory.CreateDbContext();
-            var sizeEntity = await context.Sizes.FirstOrDefaultAsync(x => x.Name == sizeName);
+            var sizeEntity = await context.Sizes.FirstOrDefaultAsync(x => x.Id == sizeId);
 
             if (sizeEntity == null)
             {
-                Console.WriteLine($"Size {sizeName} not found.");
+                Console.WriteLine($"Size {sizeId} not found.");
                 return null;
             }
 
