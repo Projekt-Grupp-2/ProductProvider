@@ -14,26 +14,32 @@ public class ReviewService(IDbContextFactory<DataContext> context)
     {
         try
         {
-            await using var context = _context.CreateDbContext();
+            if (reviewModel.ProductId != Guid.Empty)
+            {
+
+                await using var context = _context.CreateDbContext();
 
                 var reviewEntity = new ReviewEntity
                 {
                     Stars = reviewModel.Stars,
                     Text = reviewModel.Text,
                     ProductId = reviewModel.ProductId,
-                    Product = reviewModel.Product,
                 };
                 context.Reviews.Add(reviewEntity);
                 await context.SaveChangesAsync();
                 await context.DisposeAsync();
                 Console.WriteLine("Review successfully created");
                 return reviewEntity;
+
+            }
+            return null!;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
             return null!;
         }
+
     }
 
     public async Task<IEnumerable<ReviewEntity>> GetAllReviewsAsync()
@@ -49,7 +55,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             }
             else
             {
-               
+
                 return reviewEntities;
             }
 
@@ -102,7 +108,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             await using var context = _context.CreateDbContext();
 
             var reviewEntity = await context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
-            if(reviewEntity != null)
+            if (reviewEntity != null)
             {
                 var reviewModel = new ReviewModel
                 {
@@ -116,7 +122,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
             else
             {
                 return null!;
-            }   
+            }
         }
         catch (Exception ex)
         {
@@ -125,7 +131,7 @@ public class ReviewService(IDbContextFactory<DataContext> context)
         }
     }
 
-  
+
     public async Task<ReviewModel> UpdateReviewAsync(ReviewUpdateRequest request)
     {
         try
