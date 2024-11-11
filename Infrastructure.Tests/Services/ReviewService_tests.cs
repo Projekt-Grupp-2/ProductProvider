@@ -64,6 +64,7 @@ public class ReviewServiceTests
             Text = "Great product!",
             Stars = 5,
             ProductId = _productEntity.Id,
+            Product = _productEntity,
         };
 
         // Act
@@ -93,7 +94,7 @@ public class ReviewServiceTests
         var invalidReviewModel = new ReviewModel
         {
             Text = "Bad review",
-            Stars = 1
+            Stars = 1,
         };
 
         var options = new DbContextOptionsBuilder<DataContext>()

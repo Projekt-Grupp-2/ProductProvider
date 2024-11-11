@@ -10,4 +10,6 @@ public class ReviewModel
     public int Stars { get; set; }
 
     public string Text { get; set; } = null!;
+
+    public virtual ProductEntity Product { get; set; } = new ProductEntity();
 }

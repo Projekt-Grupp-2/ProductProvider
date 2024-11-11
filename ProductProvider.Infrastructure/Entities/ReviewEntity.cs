@@ -10,5 +10,5 @@ public partial class ReviewEntity
 
     public string Text { get; set; } = null!;
 
-    public virtual ProductEntity? Product { get; set; }
+    public virtual ProductEntity Product { get; set; } = new ProductEntity();
 }
