@@ -155,7 +155,7 @@ public class PriceService(IDbContextFactory<DataContext> context)
             priceEntity.StartDate = priceModel.StartDate;
             priceEntity.EndDate = priceModel.EndDate;
             priceEntity.IsActive = priceModel.IsActive;
-            priceEntity.Product = priceModel.Product;
+
             await context.SaveChangesAsync();
 
             return priceEntity;
