@@ -15,7 +15,7 @@ public class GetReviewsByProductId(ILogger<GetReviewsByProductId> logger, Review
     private readonly ReviewService _reviewService = reviewService;
 
     [Function("GetReviewsByProductId")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "getreviews/{productId}")] HttpRequest req, Guid productId)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "getreviews/{productId}")] HttpRequest req, Guid productId)
     {
 
         try
