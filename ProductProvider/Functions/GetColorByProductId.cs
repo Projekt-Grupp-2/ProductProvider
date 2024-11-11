@@ -9,7 +9,6 @@ namespace ProductProvider.Functions
     public class GetColorByProductId
     {
         private readonly ILogger<GetColorByProductId> _logger;
-        private readonly WarehouseService _warehouseService;
         private readonly ColorService _colorService;
 
         public GetColorByProductId(ILogger<GetColorByProductId> logger, ColorService colorService)
