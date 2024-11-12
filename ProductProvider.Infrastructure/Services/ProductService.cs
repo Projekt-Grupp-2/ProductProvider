@@ -243,6 +243,7 @@ public class ProductService(IDbContextFactory<DataContext> context)
         {
             await using var context = _context.CreateDbContext();
             var productEntity = await context.Products
+                .Include(p => p.Category)
                 .Include(p => p.Images)
                 .Include(p => p.Prices)
                 .Include(p => p.Warehouses)
@@ -250,10 +251,15 @@ public class ProductService(IDbContextFactory<DataContext> context)
 
             if (productEntity != null) 
             {
-                context.Images.RemoveRange(productEntity.Images);
-                context.Prices.RemoveRange(productEntity.Prices);
-                context.Warehouses.RemoveRange(productEntity.Warehouses);
+                context.Images.RemoveRange(productEntity.Images!);
+                context.Prices.RemoveRange(productEntity.Prices!);
+                context.Warehouses.RemoveRange(productEntity.Warehouses!);
                 context.Products.Remove(productEntity);
+
+                if (!context.Products.Any(p => p.CategoryId == productEntity.CategoryId))
+                {
+                    context.Categories.Remove(productEntity.Category);
+                }
 
                 await context.SaveChangesAsync();
                 return true;
