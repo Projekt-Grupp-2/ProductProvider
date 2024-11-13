@@ -104,6 +104,55 @@ public class ProductService(IDbContextFactory<DataContext> context)
         }
     }
 
+    public async Task<IEnumerable<ProductModel>> GetProductsByCategoryAsync(string categoryName)
+    {
+        try
+        {
+            await using var context = _context.CreateDbContext();
+
+            var productEntities = await context.Products
+                .Include(p => p.Images)
+                .Include(p => p.Prices)
+                .Include(p => p.Category)
+                .Where(p => p.Category != null && p.Category.Name == categoryName)
+                .ToListAsync();
+
+            var products = productEntities.Select(x => new ProductModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ShortDescription = x.ShortDescription,
+                LongDescription = x.LongDescription,
+                CategoryId = x.CategoryId,
+                CreatedAt = x.CreatedAt,
+                IsTopseller = x.IsTopseller,
+                Images = x.Images.Select(image => new ImageModel
+                {
+                    ProductId = image.ProductId,
+                    ImageUrl = image.ImageUrl
+                }).ToList(),
+                Prices = x.Prices.Select(price => new PriceModel
+                {
+                    Id = price.Id,
+                    ProductId = price.ProductId,
+                    Price1 = price.Price,
+                    Discount = price.Discount,
+                    DiscountPrice = price.DiscountPrice,
+                    StartDate = price.StartDate,
+                    EndDate = price.EndDate,
+                    IsActive = price.IsActive
+                }).ToList(),
+            }).ToList();
+
+            return products;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while fetching products by category: {ex.Message}");
+            return new List<ProductModel>();
+        }
+    }
+
     public async Task<ProductModel> GetOneProductAsync(Guid id)
     {
         try
